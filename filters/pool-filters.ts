@@ -5,7 +5,8 @@ import { BurnFilter } from './burn.filter';
 import { MutableFilter } from './mutable.filter';
 import { RenouncedFreezeFilter } from './renounced.filter';
 import { PoolSizeFilter } from './pool-size.filter';
-import { CHECK_IF_BURNED, CHECK_IF_FREEZABLE, CHECK_IF_MINT_IS_RENOUNCED, CHECK_IF_MUTABLE, CHECK_IF_SOCIALS, logger } from '../helpers';
+import { TopHoldersFilter } from './topHolders.filter';
+import { CHECK_IF_BURNED, CHECK_IF_FREEZABLE, CHECK_IF_MINT_IS_RENOUNCED, CHECK_IF_MUTABLE, CHECK_IF_SOCIALS, CHECK_IF_TOPHOLDER , TOPHOLDER_NUM, logger } from '../helpers';
 
 export interface Filter {
   execute(poolKeysV4: LiquidityPoolKeysV4): Promise<FilterResult>;
@@ -39,6 +40,10 @@ export class PoolFilters {
 
     if (CHECK_IF_MUTABLE || CHECK_IF_SOCIALS) {
       this.filters.push(new MutableFilter(connection, getMetadataAccountDataSerializer(), CHECK_IF_MUTABLE, CHECK_IF_SOCIALS));
+    }
+
+    if (CHECK_IF_TOPHOLDER) {
+      this.filters.push(new TopHoldersFilter(connection,args.quoteToken, TOPHOLDER_NUM));
     }
 
     if (!args.minPoolSize.isZero() || !args.maxPoolSize.isZero()) {
